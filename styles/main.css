@@ -1,0 +1,54 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --color-bg: #000;
+  --color-fg: #ffffff;              /* nuevo: blanco por defecto */
+  --color-accent-green: #33ff33;    /* para menú principal y buddy */
+  --color-player: #ffffff;          /* blanco */
+  --color-ai: #ff3344;              /* fallback, será sobrescrito dinámicamente */
+  --color-dim: #333333;             /* gris oscuro neutro */
+  --color-highlight: #ffffff;       /* highlight de casillas válidas */
+  --color-error: #ff3333;
+  --color-muted: #888888;
+}
+
+html, body {
+  width: 100%; height: 100%;
+  background: var(--color-bg);
+  color: var(--color-fg);
+  font-family: "Cascadia Mono", "Consolas", "Courier New", monospace;
+  font-size: 14px;
+  line-height: 1.2;
+  overflow: hidden;
+}
+
+.scene { display: none; width: 100%; height: 100%; }
+.scene.active { display: block; }
+
+/* Efecto CRT scanlines — bajar opacidad para mayor profesionalidad */
+body::before {
+  content: "";
+  position: fixed; inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0,0,0,0.08) 0,
+    rgba(0,0,0,0.08) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  pointer-events: none;
+  z-index: 9999;
+}
+
+@keyframes blink { 50% { opacity: 0; } }
+.blink { animation: blink 1.2s steps(1) infinite; }
+
+@keyframes glow {
+  0%, 100% { text-shadow: 0 0 4px currentColor; }
+  50% { text-shadow: 0 0 12px currentColor, 0 0 20px currentColor; }
+}
+.glow { animation: glow 2.4s ease-in-out infinite; }
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #000; }
+::-webkit-scrollbar-thumb { background: var(--color-dim); }
