@@ -179,6 +179,27 @@ window.ASCII_ART = {
     };
   },
 
+  BG_SHIPS: [
+    '>=o=>',
+    '<=o=<',
+    '~<O>~',
+    '-=[#]=-',
+    '<__/\\__>',
+    '<o]≡≡≡[o>',
+    '>~~█~~>',
+    '<\\.--./>',
+    '[=■=]',
+    '>{◇}>',
+  ],
+
+  BG_ASTEROIDS: [
+    '(°°°)',
+    '*•*•',
+    '{:.:}',
+    '(███)',
+    '~o.O~',
+  ],
+
   boxify(text, title = '') {
     const lines = text.split('\n');
     const w = Math.max(...lines.map(l => l.length), title.length + 4);
