@@ -4,6 +4,33 @@
   grid-template-columns: 1fr 2fr;
   gap: 1px;
   background: var(--color-dim);
+  position: relative;
+}
+
+/* CRT scanlines sobre el scene-game */
+#scene-game.active::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.07) 2px,
+    rgba(0,0,0,0.07) 4px
+  );
+  pointer-events: none;
+  z-index: 50;
+}
+
+/* Viñeta de pantalla CRT */
+#scene-game.active::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 45%, rgba(0,0,0,0.5) 100%);
+  pointer-events: none;
+  z-index: 51;
 }
 
 .panel-left, .panel-right {
@@ -12,7 +39,7 @@
   position: relative;
 }
 
-/* Panel izquierdo */
+/* ─── PANEL IZQUIERDO ─────────────────────────── */
 .panel-left {
   display: flex;
   flex-direction: column;
@@ -21,14 +48,29 @@
   color: var(--color-fg);
 }
 
+/* Header de sistema en el panel izquierdo */
+.panel-header {
+  background: #060c06;
+  border-bottom: 1px solid var(--color-accent-green);
+  padding: 7px 14px;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--color-accent-green);
+  text-shadow: 0 0 8px rgba(51,255,51,0.65);
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
 .rules-section { border-bottom: 1px solid var(--color-dim); }
 .rules-toggle {
   cursor: pointer;
-  padding: 10px 14px;
-  font-size: 13px;
+  padding: 9px 14px;
+  font-size: 11px;
   user-select: none;
   letter-spacing: 1px;
-  color: var(--color-fg);
+  color: var(--color-muted);
+  transition: color 0.15s;
 }
 .rules-toggle:hover { color: var(--color-accent-green); }
 .rules-content {
@@ -36,7 +78,7 @@
   white-space: pre-wrap;
   font-size: 11px;
   line-height: 1.5;
-  max-height: 240px;
+  max-height: 220px;
   overflow-y: auto;
   color: var(--color-muted);
   border-top: 1px solid var(--color-dim);
@@ -44,16 +86,21 @@
 .rules-content.collapsed { display: none; }
 
 .hand-section {
-  padding: 16px 14px;
+  padding: 14px 14px;
   flex: 1;
   overflow-y: auto;
 }
 .hand-title {
-  font-size: 12px;
-  margin-bottom: 16px;
-  letter-spacing: 2px;
-  color: var(--color-fg);
+  font-size: 10px;
+  margin-bottom: 14px;
+  letter-spacing: 1px;
+  color: var(--color-accent-green);
+  text-shadow: 0 0 6px rgba(51,255,51,0.35);
   text-align: center;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(51,255,51,0.15);
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 /* HONEYCOMB layout para la mano (patrón 2-1-2) */
@@ -69,7 +116,6 @@
   gap: 8px;
 }
 .hand-row.offset {
-  /* fila de en medio: desplazada para encajar visualmente */
   margin: -22px 0;
 }
 
@@ -90,7 +136,6 @@
   text-align: center;
 }
 .hand-piece::before {
-  /* Borde simulado usando un pseudoelemento más pequeño */
   content: "";
   position: absolute;
   inset: 2px;
@@ -100,7 +145,6 @@
 }
 .hand-piece > * { position: relative; z-index: 1; }
 
-/* Borde exterior con clip-path → simulamos con outline trick: wrap */
 .hand-piece-wrap {
   position: relative;
   width: 84px;
@@ -109,9 +153,13 @@
   background: var(--color-fg);
   padding: 1.5px;
   cursor: grab;
+  transition: filter 0.15s;
 }
 .hand-piece-wrap.zero { opacity: 0.25; cursor: not-allowed; }
-.hand-piece-wrap:hover:not(.zero) { background: var(--color-accent-green); }
+.hand-piece-wrap:hover:not(.zero) {
+  background: var(--color-accent-green);
+  filter: drop-shadow(0 0 8px rgba(51,255,51,0.55));
+}
 .hand-piece-wrap:hover:not(.zero) .hand-piece { background: #0c0c0c; }
 .hand-piece-wrap:hover:not(.zero) .hand-piece .glyph { color: var(--color-accent-green); }
 
@@ -136,56 +184,120 @@
   margin-top: 3px;
 }
 
-/* Panel derecho */
+/* ─── PANEL DERECHO ───────────────────────────── */
 .panel-right {
   display: flex;
   flex-direction: column;
 }
+
+/* Barra de estado: turno + contador */
+.status-bar {
+  display: flex;
+  align-items: stretch;
+  border-bottom: 1px solid var(--color-dim);
+}
+
 .turn-banner {
   padding: 10px 14px;
-  font-size: 14px;
-  border-bottom: 1px solid var(--color-dim);
-  text-align: right;
+  font-size: 13px;
   letter-spacing: 3px;
-}
-.turn-banner.your-turn { color: var(--color-fg); }
-.turn-banner.ai-turn { color: var(--color-ai); }
-
-.opponent-row {
+  flex: 1;
   display: flex;
-  gap: 16px;
-  padding: 10px 14px;
-  border-bottom: 1px solid var(--color-dim);
-  min-height: 96px;
   align-items: center;
 }
+.turn-banner.your-turn { color: var(--color-fg); }
+.turn-banner.ai-turn   { color: var(--color-ai); }
+
+.turn-counter {
+  padding: 10px 14px;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  color: var(--color-muted);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border-left: 1px solid var(--color-dim);
+  white-space: nowrap;
+}
+.turn-counter-val {
+  color: var(--color-fg);
+  font-weight: bold;
+}
+
+/* Fila del oponente */
+.opponent-row {
+  display: flex;
+  gap: 14px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--color-dim);
+  min-height: 90px;
+  align-items: center;
+  background: #020802;
+}
+
+/* Frame ASCII del alien */
+.opponent-art-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex-shrink: 0;
+}
+.opponent-art-frame-label {
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  color: var(--color-ai);
+  opacity: 0.6;
+}
+.opponent-art-frame {
+  border: 1px solid var(--color-ai);
+  padding: 5px 8px;
+  box-shadow: 0 0 14px rgba(0,0,0,0.7), inset 0 0 10px rgba(0,0,0,0.4);
+}
+
 .opponent-art {
   white-space: pre;
   font-size: 10px;
   line-height: 1;
   color: var(--color-ai);
   text-shadow: 0 0 6px var(--color-ai);
+  margin: 0;
 }
 .opponent-info {
   font-size: 12px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
   justify-content: center;
 }
 .opponent-name {
   color: var(--color-ai);
   font-size: 15px;
   letter-spacing: 2px;
+  text-shadow: 0 0 10px var(--color-ai);
 }
 #opponent-status { color: var(--color-muted); font-size: 11px; letter-spacing: 1px; }
 
+/* Board */
 #board-container {
   flex: 1;
   position: relative;
   overflow: hidden;
   background: #000;
 }
+
+/* Etiqueta de sector en esquina del tablero */
+.board-sector-label {
+  position: absolute;
+  top: 8px;
+  left: 12px;
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  color: rgba(51,255,51,0.2);
+  pointer-events: none;
+  z-index: 10;
+  font-family: inherit;
+}
+
 #board {
   position: absolute;
   left: 50%; top: 50%;
@@ -193,7 +305,7 @@
   width: 800px; height: 600px;
 }
 
-/* HEX TILES — tablero visible pero sutil */
+/* HEX TILES */
 .hex {
   position: absolute;
   width: 58px; height: 67px;
@@ -205,37 +317,34 @@
   border: none;
   cursor: default;
   transition: all 0.12s;
-  box-shadow: inset 0 0 0 1px #1f1f1f;
+  box-shadow: inset 0 0 0 1px #1a1a1a;
 }
 .hex.hex-empty {
   background: #0a0a0a;
-  box-shadow: inset 0 0 0 1px #1f1f1f;
+  box-shadow: inset 0 0 0 1px #1a1a1a;
 }
-.hex.hex-empty:hover {
-  background: #141414;
-}
-/* Highlight: casilla válida cuando se arrastra una ficha */
+.hex.hex-empty:hover { background: #141414; }
+
 .hex.hex-highlight {
-  background: #1a1a1a;
-  box-shadow: inset 0 0 0 1.5px rgba(255,255,255,0.75), 0 0 8px rgba(255,255,255,0.25);
+  background: #111;
+  box-shadow: inset 0 0 0 1.5px rgba(255,255,255,0.7), 0 0 10px rgba(255,255,255,0.2);
   cursor: crosshair;
   animation: hex-pulse 1.4s ease-in-out infinite;
 }
 @keyframes hex-pulse {
   0%, 100% { box-shadow: inset 0 0 0 1.5px rgba(255,255,255,0.75), 0 0 6px rgba(255,255,255,0.2); }
-  50%      { box-shadow: inset 0 0 0 1.5px rgba(255,255,255,1),    0 0 14px rgba(255,255,255,0.5); }
+  50%       { box-shadow: inset 0 0 0 1.5px rgba(255,255,255,1),    0 0 14px rgba(255,255,255,0.5); }
 }
 .hex.drag-over {
   background: #222;
   box-shadow: inset 0 0 0 2px var(--color-fg);
 }
-/* Piezas en el tablero */
 .hex.hex-player {
-  background: #161616;
+  background: #101010;
   box-shadow: inset 0 0 0 1.5px var(--color-fg);
 }
 .hex.hex-ai {
-  background: #161616;
+  background: #101010;
   box-shadow: inset 0 0 0 1.5px var(--color-ai);
 }
 .hex.hex-player .hex-glyph {
@@ -246,9 +355,7 @@
   color: var(--color-ai);
   text-shadow: 0 0 8px var(--color-ai);
 }
-.hex.hex-player, .hex.hex-ai {
-  cursor: pointer;
-}
+.hex.hex-player, .hex.hex-ai { cursor: pointer; }
 .hex-glyph {
   font-size: 22px;
   font-weight: bold;
@@ -256,17 +363,41 @@
   letter-spacing: 0;
 }
 
-.move-log {
-  height: 70px;
-  overflow-y: auto;
-  padding: 6px 14px;
-  font-size: 11px;
+/* Move log */
+.move-log-wrap {
+  display: flex;
+  flex-direction: column;
   border-top: 1px solid var(--color-dim);
+}
+.move-log-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 14px;
+  background: #040a04;
+  border-bottom: 1px solid var(--color-dim);
+}
+.move-log-title {
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  color: var(--color-accent-green);
+  text-shadow: 0 0 5px rgba(51,255,51,0.4);
+}
+.move-log-stats {
+  font-size: 9px;
+  letter-spacing: 1px;
+  color: var(--color-muted);
+}
+.move-log {
+  height: 52px;
+  overflow-y: auto;
+  padding: 5px 14px;
+  font-size: 11px;
   color: var(--color-muted);
   line-height: 1.5;
 }
 
-/* Game Over modal */
+/* Game Over modal (legacy) */
 .modal {
   position: fixed; inset: 0;
   background: rgba(0,0,0,0.92);
@@ -301,7 +432,7 @@
 }
 .modal-btn:hover { background: var(--color-fg); color: #000; }
 
-/* Buddy: SIEMPRE en verde */
+/* Buddy: siempre en verde */
 #buddy {
   position: fixed;
   bottom: 16px; right: 16px;
@@ -332,12 +463,12 @@
 }
 .buddy-bubble.hidden { display: none; }
 
-/* --- Move log color coding --- */
+/* Color coding del log */
 .log-line { line-height: 1.6; }
 .log-line.log-player { color: rgba(255,255,255,0.85); }
-.log-line.log-ai { color: var(--color-ai); }
+.log-line.log-ai     { color: var(--color-ai); }
 
-/* --- Turn banner animations --- */
+/* Animaciones del turn banner */
 @keyframes banner-pulse-player {
   0%, 100% { text-shadow: 0 0 4px rgba(255,255,255,0.2); }
   50%       { text-shadow: 0 0 14px rgba(255,255,255,0.7), 0 0 28px rgba(255,255,255,0.3); }
@@ -346,25 +477,19 @@
   0%, 100% { opacity: 0.75; }
   50%       { opacity: 1; }
 }
-.turn-banner.your-turn {
-  animation: banner-pulse-player 2.2s ease-in-out infinite;
-}
-.turn-banner.ai-turn {
-  animation: banner-pulse-ai 0.8s ease-in-out infinite;
-}
+.turn-banner.your-turn { animation: banner-pulse-player 2.2s ease-in-out infinite; }
+.turn-banner.ai-turn   { animation: banner-pulse-ai 0.8s ease-in-out infinite; }
 
-/* --- Opponent status: thinking indicator --- */
+/* Indicador de "pensando" del oponente */
 @keyframes thinking-blink {
-  0%, 100% { opacity: 1; color: var(--color-ai); }
-  50%       { opacity: 0.4; }
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.35; }
 }
 #opponent-status.thinking {
   color: var(--color-ai);
   animation: thinking-blink 0.9s ease-in-out infinite;
   text-shadow: 0 0 6px var(--color-ai);
 }
-
-/* --- Opponent art glow when AI is thinking --- */
-.turn-banner.ai-turn ~ .opponent-row .opponent-art {
+.opponent-art.thinking {
   animation: thinking-blink 0.9s ease-in-out infinite;
 }

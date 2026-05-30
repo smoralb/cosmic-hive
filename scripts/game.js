@@ -17,26 +17,44 @@ window.Game = {
 
     scene.innerHTML = `
       <div class="panel-left">
+        <div class="panel-header">[ STELLAR SWARM — TACTICAL v2.3 ]</div>
         <div class="rules-section">
-          <div class="rules-toggle">▼ REGLAS</div>
+          <div class="rules-toggle">▼ [ PROTOCOL MANUAL ]</div>
           <div class="rules-content collapsed">${this._rulesText()}</div>
         </div>
         <div class="hand-section">
-          <div class="hand-title">>> TUS UNIDADES <<</div>
+          <div class="hand-title">┌── [ TUS UNIDADES ] ──────────┐</div>
           <div class="hand-grid" id="player-hand"></div>
         </div>
       </div>
       <div class="panel-right">
-        <div class="turn-banner your-turn" id="turn-banner">>>> TU TURNO <<<</div>
+        <div class="status-bar">
+          <div class="turn-banner your-turn" id="turn-banner">[ >>> TU TURNO <<< ]</div>
+          <div class="turn-counter">TURNO: <span class="turn-counter-val" id="turn-num">000</span></div>
+        </div>
         <div class="opponent-row">
-          <pre class="opponent-art">${opp.art}</pre>
+          <div class="opponent-art-wrap">
+            <div class="opponent-art-frame-label">[ COMM ENTRANTE ]</div>
+            <div class="opponent-art-frame">
+              <pre class="opponent-art">${opp.art}</pre>
+            </div>
+          </div>
           <div class="opponent-info">
             <div class="opponent-name">${opp.name}</div>
-            <div id="opponent-status">ESPERANDO...</div>
+            <div id="opponent-status">[ ESPERANDO... ]</div>
           </div>
         </div>
-        <div id="board-container"><div id="board"></div></div>
-        <div class="move-log" id="move-log"></div>
+        <div id="board-container">
+          <div class="board-sector-label">SECTOR-GRID ─ ZONE-09</div>
+          <div id="board"></div>
+        </div>
+        <div class="move-log-wrap">
+          <div class="move-log-header">
+            <span class="move-log-title">[ COMM LOG — ENCRYPTED ]</span>
+            <span class="move-log-stats" id="move-log-stats">PIEZAS: TÚ 0 | ALIEN 0</span>
+          </div>
+          <div class="move-log" id="move-log"></div>
+        </div>
       </div>
       <div id="game-over-overlay" class="go-screen-curve">
         <div class="go-crt-overlay"></div>
@@ -252,10 +270,13 @@ INTEGRIDAD DEL ENJAMBRE
     this._renderHand();
     BoardView.render(state, document.getElementById('board'));
     document.getElementById('turn-banner').className = 'turn-banner ai-turn';
-    document.getElementById('turn-banner').textContent = '>>> TURNO DEL ALIEN <<<';
+    document.getElementById('turn-banner').textContent = '[ >>> TURNO DEL ALIEN <<< ]';
     const statusEl = document.getElementById('opponent-status');
-    statusEl.textContent = 'CALCULANDO...';
+    statusEl.textContent = '[ CALCULANDO... ]';
     statusEl.classList.add('thinking');
+    document.querySelector('.opponent-art')?.classList.add('thinking');
+    this._updateTurnCounter();
+    this._updateLogStats();
     Buddy.contextualTip(state, 'ai_thinking');
 
     setTimeout(() => this._runAITurn(), 700);
@@ -291,10 +312,13 @@ INTEGRIDAD DEL ENJAMBRE
 
     state.turn = 'player';
     document.getElementById('turn-banner').className = 'turn-banner your-turn';
-    document.getElementById('turn-banner').textContent = '>>> TU TURNO <<<';
+    document.getElementById('turn-banner').textContent = '[ >>> TU TURNO <<< ]';
     const statusEl2 = document.getElementById('opponent-status');
-    statusEl2.textContent = 'ESPERANDO...';
+    statusEl2.textContent = '[ ESPERANDO... ]';
     statusEl2.classList.remove('thinking');
+    document.querySelector('.opponent-art')?.classList.remove('thinking');
+    this._updateTurnCounter();
+    this._updateLogStats();
     this._renderHand();
     BoardView.render(state, document.getElementById('board'));
 
@@ -466,6 +490,21 @@ INTEGRIDAD DEL ENJAMBRE
     line.textContent = t;
     log.appendChild(line);
     log.scrollTop = log.scrollHeight;
+  },
+
+  _updateTurnCounter() {
+    const state = this._state;
+    const total = state.turnCount.player + state.turnCount.ai;
+    const el = document.getElementById('turn-num');
+    if (el) el.textContent = String(total).padStart(3, '0');
+  },
+
+  _updateLogStats() {
+    const state = this._state;
+    const playerDeployed = 11 - state.hands.player.length;
+    const aiDeployed = 11 - state.hands.ai.length;
+    const el = document.getElementById('move-log-stats');
+    if (el) el.textContent = `PIEZAS: TÚ ${playerDeployed} | ALIEN ${aiDeployed}`;
   },
 
   restart() {
