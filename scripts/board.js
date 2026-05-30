@@ -84,8 +84,12 @@ window.BoardView = {
       minQ = Math.min(minQ,q); maxQ = Math.max(maxQ,q);
       minR = Math.min(minR,r); maxR = Math.max(maxR,r);
     }
-    // Añadir un anillo de vacíos alrededor
+    // Buffer alrededor de piezas + mínimo para llenar el contenedor
     minQ -= 2; maxQ += 2; minR -= 2; maxR += 2;
+    if (minQ > -8) minQ = -8;
+    if (maxQ <  8) maxQ =  8;
+    if (minR > -7) minR = -7;
+    if (maxR <  7) maxR =  7;
 
     const size = this._size;
     const hexW = size * Math.sqrt(3);
@@ -132,6 +136,8 @@ window.BoardView = {
           }
         } else {
           el.classList.add('hex-empty');
+          const isAdjacent = Hex.DIRS.some(([dq, dr]) => state.board.has(Hex.key(q + dq, r + dr)));
+          if (isAdjacent) el.classList.add('hex-adjacent');
         }
 
         if (this._highlighted.has(key)) el.classList.add('hex-highlight');

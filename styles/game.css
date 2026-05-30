@@ -69,10 +69,15 @@
   font-size: 11px;
   user-select: none;
   letter-spacing: 1px;
-  color: var(--color-muted);
-  transition: color 0.15s;
+  color: rgba(255,255,255,0.8);
+  text-shadow: 0 0 4px rgba(255,255,255,0.1);
+  transition: color 0.15s, text-shadow 0.15s, background 0.15s;
 }
-.rules-toggle:hover { color: var(--color-accent-green); }
+.rules-toggle:hover {
+  color: var(--color-accent-green);
+  text-shadow: 0 0 8px rgba(51,255,51,0.4);
+  background: rgba(51,255,51,0.04);
+}
 .rules-content {
   padding: 10px 14px;
   white-space: pre-wrap;
@@ -282,7 +287,7 @@
   flex: 1;
   position: relative;
   overflow: hidden;
-  background: #000;
+  background: radial-gradient(ellipse at center, #030d03 0%, #000 70%);
 }
 
 /* Etiqueta de sector en esquina del tablero */
@@ -313,47 +318,55 @@
   align-items: center;
   justify-content: center;
   clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-  background: #0a0a0a;
+  background: #060e06;
   border: none;
   cursor: default;
-  transition: all 0.12s;
-  box-shadow: inset 0 0 0 1px #1a1a1a;
+  transition: background 0.15s, box-shadow 0.15s;
+  box-shadow: inset 0 0 0 1px rgba(51,255,51,0.12);
 }
 .hex.hex-empty {
-  background: #0a0a0a;
-  box-shadow: inset 0 0 0 1px #1a1a1a;
+  background: #060e06;
+  box-shadow: inset 0 0 0 1px rgba(51,255,51,0.12);
 }
-.hex.hex-empty:hover { background: #141414; }
+.hex.hex-empty:hover {
+  background: #0d1f0d;
+  box-shadow: inset 0 0 0 1px rgba(51,255,51,0.28);
+}
+
+.hex.hex-adjacent {
+  background: #091509;
+  box-shadow: inset 0 0 0 1px rgba(51,255,51,0.32), inset 0 0 10px rgba(51,255,51,0.06);
+}
 
 .hex.hex-highlight {
-  background: #111;
-  box-shadow: inset 0 0 0 1.5px rgba(255,255,255,0.7), 0 0 10px rgba(255,255,255,0.2);
+  background: #001a1f;
+  box-shadow: inset 0 0 0 2px #00ffe5, 0 0 14px rgba(0,255,229,0.4);
   cursor: crosshair;
-  animation: hex-pulse 1.4s ease-in-out infinite;
+  animation: hex-pulse 1.1s ease-in-out infinite;
 }
 @keyframes hex-pulse {
-  0%, 100% { box-shadow: inset 0 0 0 1.5px rgba(255,255,255,0.75), 0 0 6px rgba(255,255,255,0.2); }
-  50%       { box-shadow: inset 0 0 0 1.5px rgba(255,255,255,1),    0 0 14px rgba(255,255,255,0.5); }
+  0%, 100% { background: #001a1f; box-shadow: inset 0 0 0 2px #00ffe5, 0 0 10px rgba(0,255,229,0.35); }
+  50%       { background: #002e38; box-shadow: inset 0 0 0 2px #00ffe5, 0 0 22px rgba(0,255,229,0.7), inset 0 0 12px rgba(0,255,229,0.15); }
 }
 .hex.drag-over {
-  background: #222;
-  box-shadow: inset 0 0 0 2px var(--color-fg);
+  background: #152015;
+  box-shadow: inset 0 0 0 2px var(--color-fg), 0 0 12px rgba(255,255,255,0.2);
 }
 .hex.hex-player {
-  background: #101010;
-  box-shadow: inset 0 0 0 1.5px var(--color-fg);
+  background: #111;
+  box-shadow: inset 0 0 0 1.5px var(--color-fg), 0 0 8px rgba(255,255,255,0.15);
 }
 .hex.hex-ai {
-  background: #101010;
-  box-shadow: inset 0 0 0 1.5px var(--color-ai);
+  background: #111;
+  box-shadow: inset 0 0 0 1.5px var(--color-ai), 0 0 8px rgba(var(--color-ai-rgb, 255,51,68), 0.2);
 }
 .hex.hex-player .hex-glyph {
   color: var(--color-fg);
-  text-shadow: 0 0 6px rgba(255,255,255,0.5);
+  text-shadow: 0 0 8px rgba(255,255,255,0.7), 0 0 20px rgba(255,255,255,0.3);
 }
 .hex.hex-ai .hex-glyph {
   color: var(--color-ai);
-  text-shadow: 0 0 8px var(--color-ai);
+  text-shadow: 0 0 10px var(--color-ai), 0 0 22px var(--color-ai);
 }
 .hex.hex-player, .hex.hex-ai { cursor: pointer; }
 .hex-glyph {
@@ -435,7 +448,7 @@
 /* Buddy: siempre en verde */
 #buddy {
   position: fixed;
-  bottom: 16px; right: 16px;
+  bottom: 16px; left: 16px;
   z-index: 100;
   font-family: inherit;
   text-align: center;
