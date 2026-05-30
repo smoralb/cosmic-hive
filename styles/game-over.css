@@ -1,0 +1,391 @@
+@keyframes go-scanline {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
+@keyframes go-flicker {
+  0% { opacity: 0.97; }
+  5% { opacity: 0.9; }
+  10% { opacity: 0.98; }
+  15% { opacity: 0.85; }
+  20% { opacity: 0.99; }
+  100% { opacity: 1; }
+}
+@keyframes go-pulse-glow {
+  0%, 100% { filter: drop-shadow(0 0 5px var(--go-color, #33ff33)); }
+  50% { filter: drop-shadow(0 0 20px var(--go-color, #33ff33)); }
+}
+@keyframes go-btn-flicker {
+  0% { opacity: 1; filter: drop-shadow(0 0 10px var(--go-color, #33ff33)); }
+  50% { opacity: 0.85; filter: drop-shadow(0 0 2px var(--go-color, #33ff33)); }
+  100% { opacity: 1; filter: drop-shadow(0 0 15px var(--go-color, #33ff33)); }
+}
+@keyframes go-grain {
+  0%, 100% { transform: translate(0, 0); }
+  10% { transform: translate(-5%, -10%); }
+  30% { transform: translate(3%, -15%); }
+  50% { transform: translate(12%, 9%); }
+  70% { transform: translate(9%, 4%); }
+  90% { transform: translate(-10%, 10%); }
+}
+@keyframes go-shooting-star {
+  0% { transform: translateX(0) translateY(0) rotate(-45deg); opacity: 0; }
+  10% { opacity: 1; }
+  70% { opacity: 1; }
+  100% { transform: translateX(1000px) translateY(1000px) rotate(-45deg); opacity: 0; }
+}
+@keyframes go-scanline-portrait {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
+
+#game-over-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  background: #000;
+  color: var(--go-color, #33ff33);
+  font-family: "Cascadia Mono", "Consolas", "Courier New", monospace;
+  text-shadow: 0 0 5px rgba(51,255,51,0.5);
+  overflow: hidden;
+  flex-direction: column;
+  padding: 2rem 2rem 1rem;
+}
+#game-over-overlay.active {
+  display: flex;
+}
+
+#game-over-overlay .go-crt-overlay::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(rgba(18,16,16,0) 50%, rgba(0,0,0,0.25) 50%),
+              linear-gradient(90deg, rgba(255,0,0,0.04), rgba(0,255,0,0.02), rgba(0,0,255,0.04));
+  background-size: 100% 3px, 3px 100%;
+  pointer-events: none;
+  z-index: 9100;
+}
+
+#game-over-overlay .go-crt-vignette {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at center, transparent 40%, rgba(0,0,0,0.5) 90%),
+              radial-gradient(circle at center, rgba(var(--go-rgb, 51,255,51), 0.03) 0%, transparent 80%);
+  pointer-events: none;
+  z-index: 9101;
+}
+
+#game-over-overlay .go-scanline {
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent, rgba(51,255,51,0.08) 50%, transparent);
+  animation: go-scanline 6s linear infinite;
+  pointer-events: none;
+  z-index: 9102;
+}
+
+#game-over-overlay .go-grain-overlay {
+  position: fixed;
+  top: -50%; left: -50%; width: 200%; height: 200%;
+  opacity: 0.06;
+  pointer-events: none;
+  z-index: 9099;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 256px 256px;
+  animation: go-grain 0.5s steps(1) infinite;
+}
+
+#game-over-overlay.go-screen-curve {
+  filter: contrast(1.1) brightness(1.1) saturate(1.2);
+}
+#game-over-overlay.go-flicker-active {
+  animation: go-flicker 0.15s infinite;
+}
+
+#game-over-overlay .go-phosphor-text {
+  text-shadow: 0 0 12px rgba(var(--go-rgb, 51,255,51), 0.6), 0 0 2px rgba(255,255,255,0.3);
+}
+
+#game-over-overlay .go-starfield {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+#game-over-overlay .go-shooting-star {
+  position: absolute;
+  width: 100px;
+  height: 1px;
+  background: linear-gradient(to right, #fff, transparent);
+  opacity: 0;
+  z-index: -1;
+}
+
+#game-over-overlay .go-star {
+  position: absolute;
+  background: var(--go-color, #33ff33);
+  border-radius: 50%;
+  opacity: 0.7;
+  animation: star-twinkle var(--dur, 3s) ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+}
+#game-over-overlay .go-star.dim {
+  background: #fff;
+  opacity: 0.4;
+}
+
+#game-over-overlay .go-top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+  margin-bottom: 1rem;
+  position: relative;
+  z-index: 1;
+  font-size: 10px;
+  opacity: 0.6;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+#game-over-overlay .go-banner-wrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+  position: relative;
+  z-index: 1;
+}
+#game-over-overlay .go-banner {
+  text-align: center;
+  white-space: pre;
+  font-size: clamp(18px, 2.8vw, 36px);
+  line-height: 1.1;
+  animation: go-flicker 0.15s infinite;
+}
+#game-over-overlay .go-banner-hr {
+  width: 60%;
+  height: 2px;
+  margin: 0.5rem auto 0;
+  opacity: 0.5;
+  animation: go-pulse-glow 3s ease-in-out infinite;
+}
+
+#game-over-overlay .go-main {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  align-items: center;
+  max-width: 1100px;
+  width: 100%;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+#game-over-overlay .go-alien-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+#game-over-overlay .go-alien-frame {
+  border: 2px solid var(--go-color, #33ff33);
+  padding: 2px;
+  position: relative;
+  box-shadow: inset 0 0 40px rgba(var(--go-rgb, 51,255,51), 0.15), 0 0 10px rgba(var(--go-rgb, 51,255,51), 0.3);
+}
+#game-over-overlay .go-alien-frame::before {
+  content: "«« CRT_MONITOR_01 »»";
+  position: absolute;
+  top: -12px; left: 12px;
+  background: #000;
+  padding: 0 8px;
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: var(--go-color, #33ff33);
+  z-index: 1;
+}
+#game-over-overlay .go-alien-frame::after {
+  content: "[ STATUS: CRITICAL ]";
+  position: absolute;
+  bottom: -12px; right: 12px;
+  background: #000;
+  padding: 0 8px;
+  font-size: 9px;
+  color: var(--go-color, #33ff33);
+  opacity: 0.8;
+  z-index: 1;
+}
+#game-over-overlay .go-alien-frame-inner {
+  background: #000;
+  border: 2px solid var(--go-color, #33ff33);
+  padding: 1.2rem;
+  position: relative;
+  overflow: hidden;
+}
+#game-over-overlay .go-alien-scanline {
+  position: absolute;
+  width: 100%; height: 2px;
+  background: rgba(var(--go-rgb, 51,255,51), 0.25);
+  top: 0; left: 0;
+  animation: go-scanline-portrait 3s linear infinite;
+  box-shadow: 0 0 10px var(--go-color, #33ff33);
+  pointer-events: none;
+}
+#game-over-overlay .go-alien-art {
+  white-space: pre;
+  font-size: 13px;
+  line-height: 1.15;
+  text-align: center;
+  color: var(--go-color, #33ff33);
+  filter: brightness(0.9) sepia(1) hue-rotate(80deg) saturate(5);
+}
+#game-over-overlay .go-alien-label {
+  margin-top: 0.75rem;
+  font-size: 12px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  text-align: center;
+}
+#game-over-overlay .go-alien-label small {
+  opacity: 0.5;
+  font-size: 10px;
+  display: block;
+  margin-top: 2px;
+}
+
+#game-over-overlay .go-stats-panel {
+  border: 2px solid var(--go-color, #33ff33);
+  background: rgba(0,0,0,0.85);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+#game-over-overlay .go-stats-title {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(51,255,51,0.3);
+}
+#game-over-overlay .go-stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 14px;
+}
+#game-over-overlay .go-stat-label {
+  opacity: 0.7;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+#game-over-overlay .go-stat-value {
+  font-size: 22px;
+  font-weight: 700;
+}
+#game-over-overlay .go-rank-box {
+  margin-top: 0.5rem;
+  padding: 0.75rem;
+  border: 2px dashed var(--go-color, #33ff33);
+  background: rgba(var(--go-rgb, 51,255,51), 0.05);
+  text-align: center;
+  position: relative;
+}
+#game-over-overlay .go-rank-box .go-corners::before,
+#game-over-overlay .go-rank-box .go-corners::after {
+  content: "";
+  position: absolute;
+  width: 10px; height: 10px;
+  border-color: var(--go-color, #33ff33);
+  border-style: solid;
+}
+#game-over-overlay .go-rank-box .go-corners::before {
+  top: -2px; left: -2px;
+  border-width: 2px 0 0 2px;
+}
+#game-over-overlay .go-rank-box .go-corners::after {
+  top: -2px; right: -2px;
+  border-width: 2px 2px 0 0;
+}
+#game-over-overlay .go-rank-box .go-corners span::before,
+#game-over-overlay .go-rank-box .go-corners span::after {
+  content: "";
+  position: absolute;
+  width: 10px; height: 10px;
+  border-color: var(--go-color, #33ff33);
+  border-style: solid;
+}
+#game-over-overlay .go-rank-box .go-corners span::before {
+  bottom: -2px; left: -2px;
+  border-width: 0 0 2px 2px;
+}
+#game-over-overlay .go-rank-box .go-corners span::after {
+  bottom: -2px; right: -2px;
+  border-width: 0 2px 2px 0;
+}
+#game-over-overlay .go-rank-label {
+  font-size: 11px;
+  opacity: 0.5;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 4px;
+}
+#game-over-overlay .go-rank-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: #000;
+  background: var(--go-color, #33ff33);
+  display: inline-block;
+  padding: 2px 16px;
+  letter-spacing: 4px;
+}
+#game-over-overlay .go-footer-log {
+  text-align: center;
+  font-size: 9px;
+  opacity: 0.4;
+  padding-top: 0.5rem;
+  letter-spacing: 2px;
+}
+
+#game-over-overlay .go-footer-btns {
+  display: flex;
+  justify-content: center;
+  gap: 3rem;
+  margin-top: auto;
+  padding-top: 1rem;
+  position: relative;
+  z-index: 1;
+}
+
+#game-over-overlay .go-btn {
+  border: 1px solid var(--go-color, #33ff33);
+  background: rgba(var(--go-rgb, 51,255,51), 0.05);
+  color: var(--go-color, #33ff33);
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  padding: 0.6rem 2rem;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4,0,0.2,1);
+  position: relative;
+  overflow: hidden;
+}
+#game-over-overlay .go-btn::before { content: "[ "; }
+#game-over-overlay .go-btn::after { content: " ]"; }
+#game-over-overlay .go-btn:focus-visible,
+#game-over-overlay .go-btn:hover {
+  background: var(--go-color, #33ff33);
+  color: #000;
+  box-shadow: 0 0 25px var(--go-color, #33ff33);
+  outline: none;
+  animation: go-btn-flicker 0.2s infinite;
+  transform: scale(1.05);
+}

@@ -38,10 +38,66 @@ window.Game = {
         <div id="board-container"><div id="board"></div></div>
         <div class="move-log" id="move-log"></div>
       </div>
-      <div class="modal" id="game-over-modal">
-        <div class="modal-box">
-          <pre class="modal-text" id="game-over-text"></pre>
-          <button class="modal-btn" id="play-again-btn">[ JUGAR DE NUEVO ]</button>
+      <div id="game-over-overlay" class="go-screen-curve">
+        <div class="go-crt-overlay"></div>
+        <div class="go-crt-vignette"></div>
+        <div class="go-scanline"></div>
+        <div class="go-grain-overlay"></div>
+        <div class="go-starfield" id="go-starfield"></div>
+
+        <div class="go-top-bar go-phosphor-text">
+          <span id="go-sys-loc">SYS_LOC: SECTOR_ZERO_NINE</span>
+          <span id="go-timestamp"></span>
+        </div>
+
+        <div class="go-banner-wrap">
+          <div>
+            <pre class="go-banner" id="go-banner"></pre>
+            <div class="go-banner-hr" style="background:var(--go-color,#33ff33)"></div>
+          </div>
+        </div>
+
+        <div class="go-main">
+          <div class="go-alien-panel">
+            <div class="go-alien-frame">
+              <div class="go-alien-frame-inner">
+                <div class="go-alien-scanline"></div>
+                <pre class="go-alien-art" id="go-alien-art"></pre>
+              </div>
+            </div>
+            <div class="go-alien-label" id="go-alien-label">
+              <span id="go-alien-name"></span>
+              <small id="go-alien-status"></small>
+            </div>
+          </div>
+
+          <div class="go-stats-panel">
+            <div class="go-stats-title go-phosphor-text">>> STATS_SUMMARY <<</div>
+            <div class="go-stat-row">
+              <span class="go-stat-label">TURNOS:</span>
+              <span class="go-stat-value" id="go-stat-turns">0</span>
+            </div>
+            <div class="go-stat-row">
+              <span class="go-stat-label">TUS PIEZAS:</span>
+              <span class="go-stat-value" id="go-stat-player-pieces">0</span>
+            </div>
+            <div class="go-stat-row">
+              <span class="go-stat-label">PIEZAS ALIEN:</span>
+              <span class="go-stat-value" id="go-stat-ai-pieces">0</span>
+            </div>
+            <div class="go-rank-box">
+              <div class="go-corners"><span></span></div>
+              <div class="go-rank-label">RANGO ASIGNADO</div>
+              <div class="go-rank-value" id="go-rank-value">CADETE</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="go-footer-log">===== SISTEMA DE REPORTE ESTRATÉGICO v.04.1 =====</div>
+
+        <div class="go-footer-btns">
+          <button class="go-btn" id="go-play-again">JUGAR DE NUEVO</button>
+          <button class="go-btn" id="go-main-menu">MENÚ PRINCIPAL</button>
         </div>
       </div>
     `;
@@ -53,7 +109,8 @@ window.Game = {
       scene.querySelector('.rules-content').classList.toggle('collapsed');
     });
 
-    document.getElementById('play-again-btn').addEventListener('click', () => this.restart());
+    document.getElementById('go-play-again').addEventListener('click', () => this.restart());
+    document.getElementById('go-main-menu').addEventListener('click', () => this._goMainMenu());
 
     Buddy.mount();
     Buddy.contextualTip(state, 'game_start');
@@ -196,7 +253,9 @@ INTEGRIDAD DEL ENJAMBRE
     BoardView.render(state, document.getElementById('board'));
     document.getElementById('turn-banner').className = 'turn-banner ai-turn';
     document.getElementById('turn-banner').textContent = '>>> TURNO DEL ALIEN <<<';
-    document.getElementById('opponent-status').textContent = 'CALCULANDO...';
+    const statusEl = document.getElementById('opponent-status');
+    statusEl.textContent = 'CALCULANDO...';
+    statusEl.classList.add('thinking');
     Buddy.contextualTip(state, 'ai_thinking');
 
     setTimeout(() => this._runAITurn(), 700);
@@ -233,7 +292,9 @@ INTEGRIDAD DEL ENJAMBRE
     state.turn = 'player';
     document.getElementById('turn-banner').className = 'turn-banner your-turn';
     document.getElementById('turn-banner').textContent = '>>> TU TURNO <<<';
-    document.getElementById('opponent-status').textContent = 'ESPERANDO...';
+    const statusEl2 = document.getElementById('opponent-status');
+    statusEl2.textContent = 'ESPERANDO...';
+    statusEl2.classList.remove('thinking');
     this._renderHand();
     BoardView.render(state, document.getElementById('board'));
 
@@ -245,15 +306,151 @@ INTEGRIDAD DEL ENJAMBRE
 
   _endGame(result) {
     this._state.status = result;
-    const texts = {
-      player_wins: `╔══════════════════════════════╗\n║   ¡VICTORIA ESTELAR!         ║\n║   Enjambre enemigo capturado.║\n╚══════════════════════════════╝`,
-      ai_wins:     `╔══════════════════════════════╗\n║   ENJAMBRE DERROTADO.        ║\n║   Tu NAVE NODRIZA ha caído.  ║\n╚══════════════════════════════╝`,
-      draw:        `╔══════════════════════════════╗\n║   ANIQUILACIÓN MUTUA.        ║\n║   Ambos ENJAMBRES han caído. ║\n╚══════════════════════════════╝`,
+    const overlay = document.getElementById('game-over-overlay');
+    const state = this._state;
+    const opp = this._opponent;
+
+    const banners = {
+      player_wins: `███████████████████████████████████████████████████████████████\n██                                                       ██\n██               ██╗   ██╗██╗ ██████╗████████╗             ██\n██               ██║   ██║██║██╔════╝╚══██╔══╝             ██\n██               ██║   ██║██║██║        ██║                ██\n██               ╚██╗ ██╔╝██║██║        ██║                ██\n██                ╚████╔╝ ██║╚██████╗   ██║                ██\n██                 ╚═══╝  ╚═╝ ╚═════╝   ╚═╝                ██\n██                                                       ██\n██         ███████╗████████╗███████╗██╗      █████╗       ██\n██         ██╔════╝╚══██╔══╝██╔════╝██║     ██╔══██╗      ██\n██         █████╗     ██║   █████╗  ██║     ███████║      ██\n██         ██╔══╝     ██║   ██╔══╝  ██║     ██╔══██║      ██\n██         ███████╗   ██║   ███████╗███████╗██║  ██║      ██\n██         ╚══════╝   ╚═╝   ╚══════╝╚══════╝╚═╝  ╚═╝      ██\n██                                                       ██\n██            ENJAMBRE ENEMIGO CAPTURADO.                ██\n██                                                       ██\n███████████████████████████████████████████████████████████████`,
+      ai_wins:     `███████████████████████████████████████████████████████████████\n██                                                       ██\n██           ███████╗███╗   ██╗     ██╗ █████╗           ██\n██           ██╔════╝████╗  ██║     ██║██╔══██╗          ██\n██           █████╗  ██╔██╗ ██║     ██║███████║          ██\n██           ██╔══╝  ██║╚██╗██║██   ██║██╔══██║          ██\n██           ███████╗██║ ╚████║╚█████╔╝██║  ██║          ██\n██           ╚══════╝╚═╝  ╚═══╝ ╚════╝ ╚═╝  ╚═╝          ██\n██                                                       ██\n██           ██████╗ ███████╗██████╗ ██████╗              ██\n██           ██╔══██╗██╔════╝██╔══██╗██╔══██╗             ██\n██           ██║  ██║█████╗  ██████╔╝██████╔╝             ██\n██           ██║  ██║██╔══╝  ██╔══██╗██╔══██╗             ██\n██           ██████╔╝███████╗██║  ██║██║  ██║             ██\n██           ╚═════╝ ╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝             ██\n██                                                       ██\n██             TU NAVE NODRIZA HA CAÍDO.                 ██\n██                                                       ██\n███████████████████████████████████████████████████████████████`,
+      draw:        `███████████████████████████████████████████████████████████████\n██                                                       ██\n██      █████╗ ███╗   ██╗██╗ ██████╗ ██╗   ██╗           ██\n██     ██╔══██╗████╗  ██║██║██╔════╝ ██║   ██║           ██\n██     ███████║██╔██╗ ██║██║██║  ███╗██║   ██║           ██\n██     ██╔══██║██║╚██╗██║██║██║   ██║██║   ██║           ██\n██     ██║  ██║██║ ╚████║██║╚██████╔╝╚██████╔╝           ██\n██     ╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝ ╚═════╝  ╚═════╝            ██\n██                                                       ██\n██   ███╗   ███╗██╗   ██╗████████╗██╗   ██╗ █████╗      ██\n██   ████╗ ████║██║   ██║╚══██╔══╝██║   ██║██╔══██╗     ██\n██   ██╔████╔██║██║   ██║   ██║   ██║   ██║███████║     ██\n██   ██║╚██╔╝██║██║   ██║   ██║   ██║   ██║██╔══██║     ██\n██   ██║ ╚═╝ ██║╚██████╔╝   ██║   ╚██████╔╝██║  ██║     ██\n██   ╚═╝     ╚═╝ ╚═════╝    ╚═╝    ╚═════╝ ╚═╝  ╚═╝     ██\n██                                                       ██\n██              AMBOS ENJAMBRES HAN CAÍDO.               ██\n██                                                       ██\n███████████████████████████████████████████████████████████████`,
     };
-    const buddyEvents = { player_wins: 'player_win', ai_wins: 'ai_win', draw: 'draw' };
-    document.getElementById('game-over-text').textContent = texts[result];
-    document.getElementById('game-over-modal').classList.add('active');
-    Buddy.contextualTip(this._state, buddyEvents[result]);
+
+    const colors = {
+      player_wins: '#33ff33',
+      ai_wins:     opp.color || '#ff3344',
+      draw:        '#888888',
+    };
+
+    const texts = {
+      player_wins: 'VICTORIA ESTELAR — ENJAMBRE ENEMIGO CAPTURADO',
+      ai_wins:     'ENJAMBRE DERROTADO — NAVE NODRIZA HA CAÍDO',
+      draw:        'ANIQUILACIÓN MUTUA — AMBOS ENJAMBRES DESTRUIDOS',
+    };
+
+    const ranks = [
+      { min: 0, max: 2, label: 'CADETE' },
+      { min: 3, max: 5, label: 'TENIENTE' },
+      { min: 6, max: 8, label: 'COMANDANTE' },
+      { min: 9, max: 11, label: 'ALMIRANTE' },
+    ];
+    const totalTurns = state.turnCount.player + state.turnCount.ai;
+    const rank = ranks.find(r => totalTurns >= r.min && totalTurns <= r.max) || ranks[ranks.length-1];
+
+    const playerDeployed = 11 - state.hands.player.length;
+    const aiDeployed = 11 - state.hands.ai.length;
+
+    const col = colors[result];
+    overlay.style.setProperty('--go-color', col);
+    // Parse hex to RGB for vignette/glow
+    const r = parseInt(col.slice(1,3), 16);
+    const g = parseInt(col.slice(3,5), 16);
+    const b = parseInt(col.slice(5,7), 16);
+    overlay.style.setProperty('--go-rgb', `${r},${g},${b}`);
+
+    document.getElementById('go-banner').className = 'go-banner go-phosphor-text';
+    document.getElementById('go-banner').textContent = banners[result];
+    document.getElementById('go-alien-art').textContent = opp.art;
+    document.getElementById('go-alien-name').textContent = `[ ${opp.name} ]`;
+    document.getElementById('go-alien-name').className = 'go-phosphor-text';
+    document.getElementById('go-alien-status').className = 'go-phosphor-text';
+    document.getElementById('go-alien-status').textContent = texts[result];
+    document.getElementById('go-stat-turns').textContent = totalTurns;
+    document.getElementById('go-stat-player-pieces').textContent = playerDeployed + ' / 11';
+    document.getElementById('go-stat-ai-pieces').textContent = aiDeployed + ' / 11';
+    document.getElementById('go-rank-value').textContent = rank.label;
+    document.getElementById('go-timestamp').textContent =
+      'TIMESTAMP: ' + new Date().toISOString().slice(0, 19).replace('T', ' ');
+
+    this._buildGoStarfield();
+    this._startGoShootingStars(overlay);
+    this._startGoMouseTracking(overlay);
+    this._startGoFlicker(overlay);
+    overlay.classList.add('active');
+
+    Buddy.contextualTip(this._state, 'game_over');
+  },
+
+  _buildGoStarfield() {
+    const sf = document.getElementById('go-starfield');
+    if (!sf) return;
+    sf.innerHTML = '';
+    for (let i = 0; i < 80; i++) {
+      const s = document.createElement('div');
+      s.className = 'go-star' + (Math.random() < 0.3 ? ' dim' : '');
+      s.style.left = (Math.random() * 100) + '%';
+      s.style.top = (Math.random() * 100) + '%';
+      const size = Math.random() < 0.5 ? '1px' : Math.random() < 0.8 ? '2px' : '3px';
+      s.style.width = size; s.style.height = size;
+      s.style.setProperty('--dur', (2 + Math.random() * 4).toFixed(2) + 's');
+      s.style.setProperty('--delay', (-Math.random() * 5).toFixed(2) + 's');
+      sf.appendChild(s);
+    }
+  },
+
+  _startGoShootingStars(overlay) {
+    if (this._goStarInterval) clearInterval(this._goStarInterval);
+    this._goStarInterval = setInterval(() => {
+      if (Math.random() > 0.7) {
+        const star = document.createElement('div');
+        star.className = 'go-shooting-star';
+        const startX = Math.random() * window.innerWidth;
+        const startY = Math.random() * window.innerHeight * 0.5;
+        const dur = 1 + Math.random() * 2;
+        star.style.left = startX + 'px';
+        star.style.top = startY + 'px';
+        star.style.animation = `go-shooting-star ${dur}s linear forwards`;
+        const sf = document.getElementById('go-starfield');
+        if (sf) sf.appendChild(star);
+        setTimeout(() => star.remove(), dur * 1000);
+      }
+    }, 4000);
+  },
+
+  _startGoMouseTracking(overlay) {
+    if (this._goMouseHandler) {
+      overlay.removeEventListener('mousemove', this._goMouseHandler);
+    }
+    this._goMouseHandler = (e) => {
+      const x = (e.clientX / window.innerWidth) * 100;
+      const y = (e.clientY / window.innerHeight) * 100;
+      overlay.style.background = `radial-gradient(circle at ${x}% ${y}%, rgba(var(--go-rgb,51,255,51), 0.06) 0%, #000 80%)`;
+    };
+    overlay.addEventListener('mousemove', this._goMouseHandler);
+  },
+
+  _startGoFlicker(overlay) {
+    if (this._goFlickerInterval) clearInterval(this._goFlickerInterval);
+    this._goFlickerInterval = setInterval(() => {
+      if (Math.random() > 0.985) {
+        overlay.classList.add('go-flicker-active');
+        setTimeout(() => { overlay.classList.remove('go-flicker-active'); }, 120);
+      }
+    }, 1000);
+  },
+
+  _goMainMenu() {
+    if (this._goStarInterval) {
+      clearInterval(this._goStarInterval);
+      this._goStarInterval = null;
+    }
+    if (this._goFlickerInterval) {
+      clearInterval(this._goFlickerInterval);
+      this._goFlickerInterval = null;
+    }
+    const overlay = document.getElementById('game-over-overlay');
+    if (this._goMouseHandler) {
+      overlay.removeEventListener('mousemove', this._goMouseHandler);
+      this._goMouseHandler = null;
+    }
+    overlay.classList.remove('go-flicker-active', 'active');
+    overlay.style.background = '';
+    document.getElementById('scene-game').classList.remove('active');
+    const menu = document.getElementById('scene-menu');
+    menu.classList.add('active');
+    if (window.Menu && typeof window.Menu.init === 'function') {
+      window.Menu.init();
+    }
   },
 
   _logMove(move) {
@@ -265,13 +462,18 @@ INTEGRIDAD DEL ENJAMBRE
       ? `[${ownerStr}] desplegó ${name} en (${move.q},${move.r})`
       : `[${ownerStr}] movió ${name} → (${move.toQ},${move.toR})`;
     const line = document.createElement('div');
+    line.className = 'log-line log-' + move.owner;
     line.textContent = t;
     log.appendChild(line);
     log.scrollTop = log.scrollHeight;
   },
 
   restart() {
-    document.getElementById('game-over-modal').classList.remove('active');
+    if (this._goStarInterval) { clearInterval(this._goStarInterval); this._goStarInterval = null; }
+    if (this._goFlickerInterval) { clearInterval(this._goFlickerInterval); this._goFlickerInterval = null; }
+    const overlay = document.getElementById('game-over-overlay');
+    if (this._goMouseHandler) { overlay.removeEventListener('mousemove', this._goMouseHandler); this._goMouseHandler = null; }
+    overlay.classList.remove('go-flicker-active', 'active');
     document.getElementById('scene-game').classList.remove('active');
     this.start();
   },

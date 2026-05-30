@@ -331,3 +331,40 @@
   line-height: 1.5;
 }
 .buddy-bubble.hidden { display: none; }
+
+/* --- Move log color coding --- */
+.log-line { line-height: 1.6; }
+.log-line.log-player { color: rgba(255,255,255,0.85); }
+.log-line.log-ai { color: var(--color-ai); }
+
+/* --- Turn banner animations --- */
+@keyframes banner-pulse-player {
+  0%, 100% { text-shadow: 0 0 4px rgba(255,255,255,0.2); }
+  50%       { text-shadow: 0 0 14px rgba(255,255,255,0.7), 0 0 28px rgba(255,255,255,0.3); }
+}
+@keyframes banner-pulse-ai {
+  0%, 100% { opacity: 0.75; }
+  50%       { opacity: 1; }
+}
+.turn-banner.your-turn {
+  animation: banner-pulse-player 2.2s ease-in-out infinite;
+}
+.turn-banner.ai-turn {
+  animation: banner-pulse-ai 0.8s ease-in-out infinite;
+}
+
+/* --- Opponent status: thinking indicator --- */
+@keyframes thinking-blink {
+  0%, 100% { opacity: 1; color: var(--color-ai); }
+  50%       { opacity: 0.4; }
+}
+#opponent-status.thinking {
+  color: var(--color-ai);
+  animation: thinking-blink 0.9s ease-in-out infinite;
+  text-shadow: 0 0 6px var(--color-ai);
+}
+
+/* --- Opponent art glow when AI is thinking --- */
+.turn-banner.ai-turn ~ .opponent-row .opponent-art {
+  animation: thinking-blink 0.9s ease-in-out infinite;
+}
