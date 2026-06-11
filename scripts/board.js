@@ -73,8 +73,23 @@ window.BoardView = {
   _highlighted: new Set(),
   _dragPieceId: null,
 
+  _initTooltip() {
+    if (document.getElementById('piece-tooltip')) return;
+    const t = document.createElement('div');
+    t.id = 'piece-tooltip';
+    t.className = 'piece-tooltip';
+    t.style.display = 'none';
+    document.body.appendChild(t);
+    document.addEventListener('mousemove', e => {
+      if (t.style.display === 'none') return;
+      t.style.left = (e.clientX + 14) + 'px';
+      t.style.top  = (e.clientY - 10) + 'px';
+    });
+  },
+
   render(state, container) {
     this._container = container;
+    this._initTooltip();
     container.innerHTML = '';
 
     // Calcular bounds del enjambre
@@ -104,6 +119,7 @@ window.BoardView = {
         const key = Hex.key(q,r);
         const pixel = Hex.toPixel(q, r, size);
         const piece = GameState.topPieceAt(state, q, r);
+        const fullStack = state.board.get(key);
 
         const el = document.createElement('div');
         el.className = 'hex';
@@ -116,17 +132,40 @@ window.BoardView = {
         el.style.left = left + 'px';
         el.style.top  = top  + 'px';
 
+        // Badge de pila: si hay 2+ piezas en la celda
+        if (fullStack && fullStack.length > 1) {
+          const badge = document.createElement('span');
+          badge.className = 'hex-stack';
+          badge.textContent = '\u00d7' + fullStack.length; // ×N
+          el.appendChild(badge);
+        }
+
         const glyph = document.createElement('span');
         glyph.className = 'hex-glyph';
 
         if (piece) {
           el.classList.add(piece.owner === 'player' ? 'hex-player' : 'hex-ai');
-          glyph.textContent = PIECE_TYPES[piece.type].glyph;
+          if (piece.type === 'Mothership') el.classList.add('hex-mothership');
+          glyph.innerHTML = (window.PIECE_SPRITES && window.PIECE_SPRITES[piece.type]) || PIECE_TYPES[piece.type].glyph;
+          // Tooltip on hover
+          const def = PIECE_TYPES[piece.type];
+          el.dataset.tooltip = def.displayName + (def.desc ? '\n' + def.desc : '');
+          el.addEventListener('mouseenter', () => {
+            const t = document.getElementById('piece-tooltip');
+            if (!t) return;
+            t.innerHTML = '<strong>' + def.displayName + '</strong><br><span>' + (def.desc || '') + '</span>';
+            t.style.display = 'block';
+          });
+          el.addEventListener('mouseleave', () => {
+            const t = document.getElementById('piece-tooltip');
+            if (t) t.style.display = 'none';
+          });
           // Drag de piezas propias
           if (piece.owner === 'player') {
             el.draggable = true;
             el.addEventListener('dragstart', e => {
               this._dragPieceId = piece.id;
+              el.classList.add('hex-drag-origin');
               e.dataTransfer.setData('text/plain', piece.id);
               // Calcular movimientos legales
               const dests = Moves.legalMovesFor(window._currentState, piece);
@@ -173,7 +212,10 @@ window.BoardView = {
   clearHighlights() {
     this._highlighted.clear();
     if (!this._container) return;
-    this._container.querySelectorAll('.hex').forEach(el => el.classList.remove('hex-highlight'));
+    this._container.querySelectorAll('.hex').forEach(el => {
+      el.classList.remove('hex-highlight');
+      el.classList.remove('hex-drag-origin');
+    });
   },
 
   onCellClick(cb) { this._onCellClick = cb; },

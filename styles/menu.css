@@ -86,10 +86,10 @@
 
 /* --- Contenido del menú (z-index por encima del fondo) --- */
 .menu-title {
-  font-size: 22px;
+  font-size: 18px;
   color: var(--color-accent-green);
   white-space: pre;
-  line-height: 1.05;
+  line-height: 1.1;
   margin: 0;
   text-shadow:
     0 0 10px var(--color-accent-green),
@@ -97,7 +97,8 @@
     0 0 48px rgba(51,255,51,0.25);
   position: relative;
   z-index: 2;
-  letter-spacing: 1px;
+  letter-spacing: 0;
+  font-family: "Cascadia Mono", "Consolas", "Courier New", monospace;
 }
 
 .menu-center {
@@ -110,10 +111,11 @@
 }
 
 .menu-subtitle {
-  font-size: 16px;
-  letter-spacing: 4px;
+  font-size: 12px;
+  letter-spacing: 1px;
   color: var(--color-accent-green);
   text-shadow: 0 0 6px var(--color-accent-green);
+  font-family: var(--font-pixel);
 }
 
 .menu-options {
@@ -126,15 +128,16 @@
 
 .menu-option {
   padding: 12px 36px;
-  font-size: 20px;
+  font-size: 14px;
   cursor: pointer;
-  letter-spacing: 3px;
+  letter-spacing: 1px;
   border: 1px solid var(--color-accent-green);
   color: var(--color-accent-green);
   background: rgba(0,20,0,0.35);
   text-align: center;
   transition: all 0.15s;
   text-shadow: 0 0 4px var(--color-accent-green);
+  font-family: var(--font-pixel);
 }
 .menu-option:hover, .menu-option:focus {
   background: var(--color-accent-green);
@@ -145,13 +148,14 @@
 }
 
 .menu-footer {
-  font-size: 11px;
-  letter-spacing: 3px;
+  font-size: 9px;
+  letter-spacing: 1px;
   color: var(--color-accent-green);
   opacity: 0.6;
   text-shadow: 0 0 4px var(--color-accent-green);
   position: relative;
   z-index: 2;
+  font-family: var(--font-pixel);
 }
 
 /* --- Modal CÓMO JUGAR --- */

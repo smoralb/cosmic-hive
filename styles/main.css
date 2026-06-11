@@ -10,6 +10,30 @@
   --color-highlight: #ffffff;       /* highlight de casillas válidas */
   --color-error: #ff3333;
   --color-muted: #888888;
+  --color-ai-rgb: 255,51,68;
+
+  /* Board palette — retro-CRT hexagonal grid */
+  --board-empty-bg: #060e06;
+  --board-empty-border: rgba(51,255,51,0.22);
+  --board-grid-line: rgba(51,255,51,0.20);
+  --board-adjacent: #ffb000;
+  --board-adjacent-rgb: 255,176,0;
+  --board-valid: #00ffe5;
+  --board-valid-rgb: 0,255,229;
+  --board-drag-origin: #c84bff;
+  --board-drag-origin-rgb: 200,75,255;
+  --board-stack: #ff8c00;
+
+  /* Arcade neon palette — anclada en el verde fósforo existente */
+  --arcade-green: #33ff33;
+  --arcade-cyan: #3df5ff;
+  --arcade-magenta: #ff4dd2;
+  --arcade-amber: #ffb000;
+  --arcade-violet: #a06bff;
+  --arcade-red: #ff3344;
+
+  /* Pixel arcade font — solo para títulos y HUD */
+  --font-pixel: "Press Start 2P", "Cascadia Mono", "Consolas", monospace;
 }
 
 html, body {

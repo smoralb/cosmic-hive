@@ -152,17 +152,37 @@
 
 #game-over-overlay .go-banner-wrap {
   display: flex;
-  justify-content: center;
-  margin-bottom: 1.5rem;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 1rem;
   position: relative;
   z-index: 1;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--go-color, #33ff33);
+  box-shadow: 0 0 20px rgba(51,255,51,0.2), inset 0 0 20px rgba(51,255,51,0.05);
 }
 #game-over-overlay .go-banner {
-  text-align: center;
-  white-space: pre;
-  font-size: clamp(18px, 2.8vw, 36px);
-  line-height: 1.1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
   animation: go-flicker 0.15s infinite;
+  width: 100%;
+}
+#game-over-overlay .go-banner-title {
+  font-size: clamp(20px, 3.5vw, 42px);
+  font-family: var(--font-pixel);
+  letter-spacing: 0.1em;
+  text-align: center;
+  filter: drop-shadow(0 0 12px var(--go-color, #33ff33));
+}
+#game-over-overlay .go-banner-sub {
+  font-size: clamp(9px, 1.2vw, 14px);
+  font-family: "Cascadia Mono", "Consolas", monospace;
+  letter-spacing: 0.2em;
+  text-align: center;
+  opacity: 0.7;
 }
 #game-over-overlay .go-banner-hr {
   width: 60%;
@@ -267,12 +287,12 @@
   gap: 0.75rem;
 }
 #game-over-overlay .go-stats-title {
-  font-size: 20px;
-  font-weight: 700;
-  letter-spacing: 4px;
+  font-size: 14px;
+  letter-spacing: 1px;
   text-transform: uppercase;
   padding-bottom: 0.5rem;
   border-bottom: 1px solid rgba(51,255,51,0.3);
+  font-family: var(--font-pixel);
 }
 #game-over-overlay .go-stat-row {
   display: flex;
@@ -337,13 +357,13 @@
   margin-bottom: 4px;
 }
 #game-over-overlay .go-rank-value {
-  font-size: 18px;
-  font-weight: 700;
+  font-size: 14px;
   color: #000;
   background: var(--go-color, #33ff33);
   display: inline-block;
   padding: 2px 16px;
-  letter-spacing: 4px;
+  letter-spacing: 1px;
+  font-family: var(--font-pixel);
 }
 #game-over-overlay .go-footer-log {
   text-align: center;
@@ -367,10 +387,9 @@
   border: 1px solid var(--go-color, #33ff33);
   background: rgba(var(--go-rgb, 51,255,51), 0.05);
   color: var(--go-color, #33ff33);
-  font-family: inherit;
-  font-size: 16px;
-  font-weight: 700;
-  letter-spacing: 4px;
+  font-family: var(--font-pixel);
+  font-size: 12px;
+  letter-spacing: 1px;
   text-transform: uppercase;
   padding: 0.6rem 2rem;
   cursor: pointer;

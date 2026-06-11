@@ -1,9 +1,9 @@
 window.PIECE_TYPES = {
-  Mothership: { glyph: 'N', displayName: 'NODRIZA',  count: 1 },
-  Crawler:    { glyph: 'R', displayName: 'REPTADOR', count: 2 },
-  Pulsar:     { glyph: 'P', displayName: 'PULSAR',   count: 3 },
-  Weaver:     { glyph: 'T', displayName: 'TEJEDORA', count: 2 },
-  Drone:      { glyph: 'D', displayName: 'DRON',     count: 3 },
+  Mothership: { glyph: 'N', displayName: 'NODRIZA',  count: 1, desc: 'Desliza 1 casilla. ¡Protégela a toda costa!' },
+  Crawler:    { glyph: 'R', displayName: 'REPTADOR', count: 2, desc: 'Desliza 1 casilla o trepa sobre otra pieza' },
+  Pulsar:     { glyph: 'P', displayName: 'PULSAR',   count: 3, desc: 'Salta en línea recta hasta el borde del enjambre' },
+  Weaver:     { glyph: 'T', displayName: 'TEJEDORA', count: 2, desc: 'Desliza exactamente 3 casillas' },
+  Drone:      { glyph: 'D', displayName: 'DRON',     count: 3, desc: 'Deslizamiento libre por el enjambre' },
 };
 
 window.createHand = function(owner) {

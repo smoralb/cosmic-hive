@@ -23,7 +23,7 @@ window.Game = {
           <div class="rules-content collapsed">${this._rulesText()}</div>
         </div>
         <div class="hand-section">
-          <div class="hand-title">┌── [ TUS UNIDADES ] ──────────┐</div>
+          <div class="hand-title">[ TUS UNIDADES ]</div>
           <div class="hand-grid" id="player-hand"></div>
         </div>
       </div>
@@ -69,10 +69,8 @@ window.Game = {
         </div>
 
         <div class="go-banner-wrap">
-          <div>
-            <pre class="go-banner" id="go-banner"></pre>
-            <div class="go-banner-hr" style="background:var(--go-color,#33ff33)"></div>
-          </div>
+          <div class="go-banner" id="go-banner"></div>
+          <div class="go-banner-hr" style="background:var(--go-color,#33ff33)"></div>
         </div>
 
         <div class="go-main">
@@ -132,6 +130,7 @@ window.Game = {
 
     Buddy.mount();
     Buddy.contextualTip(state, 'game_start');
+    setTimeout(() => Buddy.introSequence(), 3500);
 
     this._renderHand();
     BoardView.onCellDrop((pieceId, q, r) => this._handleDrop(pieceId, q, r));
@@ -197,7 +196,7 @@ INTEGRIDAD DEL ENJAMBRE
         const piece = document.createElement('div');
         piece.className = 'hand-piece';
         piece.innerHTML = `
-          <span class="glyph">${def.glyph}</span>
+          <span class="glyph">${(window.PIECE_SPRITES && window.PIECE_SPRITES[type]) || def.glyph}</span>
           <span class="pname">${def.displayName}</span>
           <span class="count">×${count}</span>
         `;
@@ -303,6 +302,20 @@ INTEGRIDAD DEL ENJAMBRE
     state.turnCount.ai++;
     if (state.moveHistory.length) this._logMove(state.moveHistory[state.moveHistory.length-1]);
 
+    // Rival lanza un insulto ocasional (1 de cada 3 turnos)
+    if (Math.random() < 0.33 && ASCII_ART.OPPONENT_TAUNTS) {
+      const taunts = ASCII_ART.OPPONENT_TAUNTS;
+      const taunt = taunts[Math.floor(Math.random() * taunts.length)];
+      const statusEl = document.getElementById('opponent-status');
+      if (statusEl) {
+        statusEl.textContent = '[ ' + taunt + ' ]';
+        statusEl.style.color = 'var(--arcade-red)';
+        setTimeout(() => {
+          if (statusEl) { statusEl.textContent = '[ ESPERANDO... ]'; statusEl.style.color = ''; }
+        }, 4000);
+      }
+    }
+
     const result = Rules.checkGameEnd(state);
     if (result) {
       BoardView.render(state, document.getElementById('board'));
@@ -335,11 +348,10 @@ INTEGRIDAD DEL ENJAMBRE
     const opp = this._opponent;
 
     const banners = {
-      player_wins: `███████████████████████████████████████████████████████████████\n██                                                       ██\n██               ██╗   ██╗██╗ ██████╗████████╗             ██\n██               ██║   ██║██║██╔════╝╚══██╔══╝             ██\n██               ██║   ██║██║██║        ██║                ██\n██               ╚██╗ ██╔╝██║██║        ██║                ██\n██                ╚████╔╝ ██║╚██████╗   ██║                ██\n██                 ╚═══╝  ╚═╝ ╚═════╝   ╚═╝                ██\n██                                                       ██\n██         ███████╗████████╗███████╗██╗      █████╗       ██\n██         ██╔════╝╚══██╔══╝██╔════╝██║     ██╔══██╗      ██\n██         █████╗     ██║   █████╗  ██║     ███████║      ██\n██         ██╔══╝     ██║   ██╔══╝  ██║     ██╔══██║      ██\n██         ███████╗   ██║   ███████╗███████╗██║  ██║      ██\n██         ╚══════╝   ╚═╝   ╚══════╝╚══════╝╚═╝  ╚═╝      ██\n██                                                       ██\n██            ENJAMBRE ENEMIGO CAPTURADO.                ██\n██                                                       ██\n███████████████████████████████████████████████████████████████`,
-      ai_wins:     `███████████████████████████████████████████████████████████████\n██                                                       ██\n██           ███████╗███╗   ██╗     ██╗ █████╗           ██\n██           ██╔════╝████╗  ██║     ██║██╔══██╗          ██\n██           █████╗  ██╔██╗ ██║     ██║███████║          ██\n██           ██╔══╝  ██║╚██╗██║██   ██║██╔══██║          ██\n██           ███████╗██║ ╚████║╚█████╔╝██║  ██║          ██\n██           ╚══════╝╚═╝  ╚═══╝ ╚════╝ ╚═╝  ╚═╝          ██\n██                                                       ██\n██           ██████╗ ███████╗██████╗ ██████╗              ██\n██           ██╔══██╗██╔════╝██╔══██╗██╔══██╗             ██\n██           ██║  ██║█████╗  ██████╔╝██████╔╝             ██\n██           ██║  ██║██╔══╝  ██╔══██╗██╔══██╗             ██\n██           ██████╔╝███████╗██║  ██║██║  ██║             ██\n██           ╚═════╝ ╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝             ██\n██                                                       ██\n██             TU NAVE NODRIZA HA CAÍDO.                 ██\n██                                                       ██\n███████████████████████████████████████████████████████████████`,
-      draw:        `███████████████████████████████████████████████████████████████\n██                                                       ██\n██      █████╗ ███╗   ██╗██╗ ██████╗ ██╗   ██╗           ██\n██     ██╔══██╗████╗  ██║██║██╔════╝ ██║   ██║           ██\n██     ███████║██╔██╗ ██║██║██║  ███╗██║   ██║           ██\n██     ██╔══██║██║╚██╗██║██║██║   ██║██║   ██║           ██\n██     ██║  ██║██║ ╚████║██║╚██████╔╝╚██████╔╝           ██\n██     ╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝ ╚═════╝  ╚═════╝            ██\n██                                                       ██\n██   ███╗   ███╗██╗   ██╗████████╗██╗   ██╗ █████╗      ██\n██   ████╗ ████║██║   ██║╚══██╔══╝██║   ██║██╔══██╗     ██\n██   ██╔████╔██║██║   ██║   ██║   ██║   ██║███████║     ██\n██   ██║╚██╔╝██║██║   ██║   ██║   ██║   ██║██╔══██║     ██\n██   ██║ ╚═╝ ██║╚██████╔╝   ██║   ╚██████╔╝██║  ██║     ██\n██   ╚═╝     ╚═╝ ╚═════╝    ╚═╝    ╚═════╝ ╚═╝  ╚═╝     ██\n██                                                       ██\n██              AMBOS ENJAMBRES HAN CAÍDO.               ██\n██                                                       ██\n███████████████████████████████████████████████████████████████`,
+      player_wins: { title: 'VICTORIA ESTELAR', sub: 'ENJAMBRE ENEMIGO CAPTURADO' },
+      ai_wins:     { title: 'ENJAMBRE DERROTADO', sub: 'TU NAVE NODRIZA HA CAIDO' },
+      draw:        { title: 'ANIQUILACION MUTUA', sub: 'AMBOS ENJAMBRES HAN CAIDO' },
     };
-
     const colors = {
       player_wins: '#33ff33',
       ai_wins:     opp.color || '#ff3344',
@@ -372,13 +384,24 @@ INTEGRIDAD DEL ENJAMBRE
     const b = parseInt(col.slice(5,7), 16);
     overlay.style.setProperty('--go-rgb', `${r},${g},${b}`);
 
-    document.getElementById('go-banner').className = 'go-banner go-phosphor-text';
-    document.getElementById('go-banner').textContent = banners[result];
+    const bannerEl = document.getElementById('go-banner');
+    bannerEl.className = 'go-banner go-phosphor-text';
+    const bdata = banners[result];
+    bannerEl.innerHTML = `<span class="go-banner-title">${bdata.title}</span><span class="go-banner-sub">${bdata.sub}</span>`;
     document.getElementById('go-alien-art').textContent = opp.art;
     document.getElementById('go-alien-name').textContent = `[ ${opp.name} ]`;
     document.getElementById('go-alien-name').className = 'go-phosphor-text';
     document.getElementById('go-alien-status').className = 'go-phosphor-text';
-    document.getElementById('go-alien-status').textContent = texts[result];
+    // Frase dramática del rival según resultado
+    let alienPhrase = texts[result];
+    if (result === 'ai_wins' && ASCII_ART.OPPONENT_VICTORY_PHRASES) {
+      const pool = ASCII_ART.OPPONENT_VICTORY_PHRASES;
+      alienPhrase = '"' + pool[Math.floor(Math.random() * pool.length)] + '"';
+    } else if (result === 'player_wins' && ASCII_ART.OPPONENT_DEFEAT_PHRASES) {
+      const pool = ASCII_ART.OPPONENT_DEFEAT_PHRASES;
+      alienPhrase = '"' + pool[Math.floor(Math.random() * pool.length)] + '"';
+    }
+    document.getElementById('go-alien-status').textContent = alienPhrase;
     document.getElementById('go-stat-turns').textContent = totalTurns;
     document.getElementById('go-stat-player-pieces').textContent = playerDeployed + ' / 11';
     document.getElementById('go-stat-ai-pieces').textContent = aiDeployed + ' / 11';

@@ -148,6 +148,38 @@ window.ASCII_ART = {
     ].join('\n'),
   ],
 
+  OPPONENT_TAUNTS: [
+    '¡Tu estrategia es tan predecible, terrícola!',
+    '¡Ja! ¿Eso es todo lo que tienes?',
+    '¡Mis cálculos superan tu miserable mente!',
+    '¡Te venceré, gusano de la Tierra!',
+    '¡El cosmos llora por tu torpeza!',
+    '¡Retírate mientras aún puedas, humano!',
+    '¡Cada movimiento tuyo me divierte!',
+    '¡Insignificante! ¡Mis tropas avanzan!',
+    '¿Ya te rindes? Sería lo más inteligente.',
+    '¡Tu derrota es una certeza matemática!',
+    '¡No hay esperanza para tu enjambre!',
+    '¡Siento lástima por ti... casi!',
+  ],
+
+  OPPONENT_VICTORY_PHRASES: [
+    '¡El cosmos me pertenece ahora, humano!',
+    '¡Predije cada uno de tus movimientos!',
+    '¡VICTORIA APLASTANTE! ¡Vuelve cuando seas mejor!',
+    '¡La galaxia se inclina ante mi superioridad!',
+    '¡Jamás fuiste rival para mí!',
+  ],
+
+  OPPONENT_DEFEAT_PHRASES: [
+    '¡Esto no ha terminado... volveré!',
+    '¡Imposible! ¡Habrá represalias, terrícola!',
+    '¡Me retiro... por ahora!',
+    '¡Maldito seas! ¡Juro venganza!',
+    '¡Error... recalculando... ¡VENGANZA!',
+    '¡Suerte de principiante! ¡La próxima será mía!',
+  ],
+
   OPPONENT_NAMES: [
     "ZRAX-9", "VOID-MIND", "K-THARRA", "OMEGA-7", "NYXIS PRIME",
     "ARCTURUS", "GLORP", "SEKHMET", "QUARK-LORD", "NEBULON",

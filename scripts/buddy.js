@@ -34,6 +34,7 @@ window.Buddy = {
   contextualTip(state, event) {
     const tips = {
       game_start:       '¡CADETE! Despliega tus unidades\ndesde el panel izquierdo.\n¡Rodea la NAVE NODRIZA enemiga para ganar!',
+      game_over:        'Misión concluida, cadete.\n¡Pulsa JUGAR DE NUEVO para reintentar!',
       queen_warning:    'AVISO: Debes desplegar tu NAVE NODRIZA\nen este turno o perderás\nla capacidad de mover unidades.',
       first_placement:  'Primer movimiento: cualquier unidad sirve.\nEl ENJAMBRE crece desde el centro.',
       illegal_move:     '¡Movimiento ilegal!\nEl ENJAMBRE debe permanecer\nconectado en todo momento.',
@@ -45,5 +46,28 @@ window.Buddy = {
       pass_turn:        'No hay movimientos disponibles.\nSaltando tu turno...',
     };
     this.say(tips[event] || '...', 7000);
+  },
+
+  // Animación de introducción: buddy vuela exactamente hasta el rules-toggle
+  introSequence() {
+    const buddyEl = document.getElementById('buddy');
+    if (!buddyEl) return;
+    const toggle = document.querySelector('.rules-toggle');
+    if (!toggle) return;
+
+    const toggleRect = toggle.getBoundingClientRect();
+    const buddyRect  = buddyEl.getBoundingClientRect();
+
+    // Desplazamiento necesario para centrar buddy junto al rules-toggle
+    const deltaX = toggleRect.left - buddyRect.left + 8;
+    const deltaY = (toggleRect.top + toggleRect.height / 2) - (buddyRect.top + buddyRect.height / 2);
+
+    buddyEl.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+    this.say('¡Psst, cadete! ¿Ves este\n[ PROTOCOL MANUAL ]?\n¡Ábrelo para ver todas las reglas!', 4500);
+    this.tick();
+
+    setTimeout(() => {
+      buddyEl.style.transform = '';
+    }, 5200);
   },
 };
